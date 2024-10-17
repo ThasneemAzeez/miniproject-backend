@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const loginModel = require("./models/admin")
 const formModel = require("./models/form")
+const base64 = require('base64-js');
 
 
 let app = Express()
@@ -20,12 +21,12 @@ app.post("/adminSignup", (req, res) => {
     res.json({ "status": "success" })
 })
 
-app.post("/adminSignIn", (req, res) => {
+app.post("/adminSignIn",async (req, res) => {
     let input = req.body
     let result = loginModel.find({ email: req.body.email }).then(
         (response) => {
             if (response.length > 0) {
-                const validator = bcrypt.compare(req.body.password, response[0].password)
+                const validator = bcrypt.compareSync(req.body.password, response[0].password)
                 if (validator) {
                     jwt.sign({ email: req.body.email }, "event-app", { expiresIn: "1d" },
                         (error, token) => {
@@ -60,7 +61,18 @@ app.post("/addForm", (req, res) => {
       });
   });
 
-
+  app.get('/api/image/:id', async (req, res) => {
+    try {
+      const imageData = await events.findById(req.params.id).select('image');
+      const base64String = base64.encode(imageData.image);
+      res.json({ image: base64String });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error fetching image');
+    }
+  });
+  
+ 
 
 app.get("/test", (req, res) => {
     res.json({ "status": "success" })

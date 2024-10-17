@@ -1,36 +1,11 @@
-const  Mongoose  = require("mongoose");
-
-
-const userSchema = Mongoose.Schema({
-  "name": {
-    type: String,
-    required: false,
-    trim: true
-  },
-  "description": {
-    type: String,
-    required: false,
-    trim: true
-  },
-  "date": {
-    type: Date,
-    required: true
-  },
-  "location": {
-    type: String,
-    required: false,
-    trim: true
-  },
-  "poster": {
-    type: Buffer, // Store the PDF data as a Buffer
-    required: false
-  },
-  "images": [
+const express = require('express');
+const Mongooose = require('mongoose');
+const userSchema = Mongooose.Schema(
     {
-      type: Buffer // Store each image data as a Buffer
+        
+        "image":{type:String,required:true}
     }
-  ]
-});
+)
 
-let formModel  = Mongoose.model('Event', userSchema);
-module.exports = formModel
+let formModel = Mongooose.model(events,userSchema);
+module.exports=formModel
