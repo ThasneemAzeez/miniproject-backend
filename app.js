@@ -6,6 +6,8 @@ const jwt = require("jsonwebtoken")
 const loginModel = require("./models/admin")
 const formModel = require("./models/form")
 const base64 = require('base64-js');
+const { default: mongoose } = require("mongoose")
+
 
 
 let app = Express()
@@ -13,12 +15,15 @@ app.use(Express.json())
 app.use(Cors())
 Mongooose.connect("mongodb+srv://thasneemazeez:thasneem38@cluster0.uk9okno.mongodb.net/eventmanagementapp?retryWrites=true&w=majority&appName=Cluster0")
 
+
+
 app.post("/adminSignup", (req, res) => {
     let input = req.body
     let hashedpassword = bcrypt.hashSync(input.password, 10)
+    input.password=hashedpassword
     let result = new loginModel(input)
     result.save()
-    res.json({ "status": "success" })
+    res.json({ status: "success" })
 })
 
 app.post("/adminSignIn",async (req, res) => {
@@ -34,7 +39,7 @@ app.post("/adminSignIn",async (req, res) => {
                                 res.json({ "status": "Token credentials fails" })
 
                             } else {
-                                res.json({ "status": "success", "token": token, "adminId": response[0]._id });
+                                res.json({ status: "success", "token": token, "adminId": response[0]._id });
 
                             }
                         }
@@ -49,28 +54,25 @@ app.post("/adminSignIn",async (req, res) => {
     ).catch()
 })
 
-app.post("/addForm", (req, res) => {
+app.post("/event_details", (req, res) => {
     const input = req.body;
+    let token = req.headers.token
+
+    jwt.verify(token,"event-app",async(error,decoded)=>{
+        if(decoded && decoded.email){
+            let result= new formModel(input)
+            await result.save()
+            res.json({"status":"success"})
+        }
+        else{
+            res.json({"status":"invalid authentication"})
+        }
+    })
   
-    const addForm = new formModel(input);
-    addForm.save()
-      .then(() => res.json({ status: "success" }))
-      .catch((error) => {
-        console.error(error);
-        res.status(500).json({ status: "error" });
-      });
+   
   });
 
-  app.get('/api/image/:id', async (req, res) => {
-    try {
-      const imageData = await events.findById(req.params.id).select('image');
-      const base64String = base64.encode(imageData.image);
-      res.json({ image: base64String });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Error fetching image');
-    }
-  });
+  
   
  
 
@@ -80,4 +82,12 @@ app.get("/test", (req, res) => {
 
 app.listen(3030, () => {
     console.log("server started")
+})
+
+
+app.post("/event-details",async(req,res)=>{
+    let input = req.body
+    let result = new formModel(input)
+    await result.save()
+    res.json({"status":"success"})
 })
