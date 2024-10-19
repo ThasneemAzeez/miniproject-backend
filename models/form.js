@@ -2,12 +2,12 @@ const express = require('express');
 const Mongooose = require('mongoose');
 const userSchema = Mongooose.Schema(
     {
-        "name":{type:String,required:true},
-        "details":{type:String,required:true},
-        "venue":{type:String,required:true},
-        "date":{type:Date,required:true},
+        "name":{type:String},
+        "details":{type:String},
+        "venue":{type:String},
+        "date":{type:Date},
         "image":{type:String},
-        "registrationlink":{type:String,requierd:true}
+        "registrationlink":{type:String}
     }
 )
 
